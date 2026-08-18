@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Finance Tracker</title>
+
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/components.css" />
+
+    <!-- Supabase JS Client & Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- Auth Container (Visible when logged out) -->
+    <section id="auth-section" class="auth-container">
+        <div class="auth-card">
+            <h2 id="auth-title">Sign In</h2>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="auth-email">Email</label>
+                    <input type="email" id="auth-email" required placeholder="you@example.com" />
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" />
+                </div>
+                <button type="submit" id="auth-submit-btn" class="btn primary-btn">Sign In</button>
+            </form>
+            <p class="auth-toggle">
+                <span id="auth-toggle-text">Don't have an account?</span>
+                <button type="button" id="auth-toggle-btn" class="text-btn">Sign Up</button>
+            </p>
+            <div id="auth-error" class="error-message"></div>
+        </div>
+    </section>
+
+    <!-- App Dashboard Container (Visible when logged in) -->
+    <div id="app-section" class="app-container hidden">
+        <!-- Top Navigation Header -->
+        <header class="app-header">
+            <div class="brand">
+                <h1>FinanceTracker</h1>
+            </div>
+            <div class="header-actions">
+                <span id="user-display" class="user-badge"></span>
+                <button id="logout-btn" class="btn secondary-btn">Log Out</button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="transactions-tab">Transactions</button>
+            <button class="tab-btn" data-tab="analysis-tab">Analytics & Summary</button>
+        </nav>
+
+        <!-- Global Date Range Selector Bar -->
+        <section class="filter-bar">
+            <div class="filter-group">
+                <label for="time-frame">Time Period:</label>
+                <select id="time-frame">
+                    <option value="monthly" selected>This Month</option>
+                    <option value="weekly">This Week</option>
+                    <option value="yearly">This Year</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+
+            <div id="custom-date-container" class="custom-dates hidden">
+                <div class="filter-group">
+                    <label for="start-date">Start:</label>
+                    <input type="date" id="start-date" />
+                </div>
+                <div class="filter-group">
+                    <label for="end-date">End:</label>
+                    <input type="date" id="end-date" />
+                </div>
+                <button id="apply-filter-btn" class="btn small-btn">Apply</button>
+            </div>
+
+            <div class="export-group">
+                <button id="export-csv-btn" class="btn outline-btn">Export Filtered CSV</button>
+            </div>
+        </section>
+
+        <!-- Tab 1: Transactions -->
+        <main id="transactions-tab" class="tab-content active">
+            <section class="transaction-controls">
+                <button id="open-modal-btn" class="btn primary-btn">+ Add Transaction</button>
+            </section>
+
+            <!-- Transactions List Table -->
+            <section class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-table-body">
+                        <!-- Dynamic rows populated via JS -->
+                    </tbody>
+                </table>
+                <div id="table-empty-state" class="empty-state hidden">No transactions found for this period.</div>
+            </section>
+        </main>
+
+        <!-- Tab 2: Analytics & Summary -->
+        <main id="analysis-tab" class="tab-content hidden">
+            <!-- Summary Metric Cards -->
+            <section class="metrics-grid">
+                <div class="metric-card income-card">
+                    <h3>Total Income</h3>
+                    <p id="total-income" class="metric-value">₹0.00</p>
+                </div>
+                <div class="metric-card expense-card">
+                    <h3>Total Expense</h3>
+                    <p id="total-expense" class="metric-value">₹0.00</p>
+                </div>
+                <div class="metric-card balance-card">
+                    <h3>Net Balance</h3>
+                    <p id="net-balance" class="metric-value">₹0.00</p>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-grid">
+                <div class="chart-box">
+                    <h3>Expense by Category</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="category-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <h3>Income vs Expense Breakdown</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="comparison-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Transaction Modal Dialog -->
+    <div id="transaction-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">New Transaction</h3>
+                <button id="close-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <form id="transaction-form">
+                <input type="hidden" id="tx-id" />
+
+                <div class="form-group">
+                    <label for="tx-type">Type</label>
+                    <select id="tx-type" required>
+                        <option value="expense" selected>Expense</option>
+                        <option value="income">Income</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tx-amount">Amount (₹)</label>
+                    <input type="number" id="tx-amount" step="0.01" min="0.01" required placeholder="0.00" />
+                </div>
+
+                <div class="form-group">
+                    <label for="tx-category">Category</label>
+                    <input type="text" id="tx-category" list="category-suggestions" required
+                        placeholder="e.g. Groceries, Rent, Salary" />
+                    <datalist id="category-suggestions">
+                        <option value="Food & Dining" />
+                        <option value="Groceries" />
+                        <option value="Rent / Utilities" />
+                        <option value="Electronics & Gadgets" />
+                        <option value="Transportation" />
+                        <option value="Salary" />
+                        <option value="Investment / Freelance" />
+                        <option value="Entertainment" />
+                    </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label for="tx-date">Date</label>
+                    <input type="date" id="tx-date" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="tx-desc">Description (Optional)</label>
+                    <input type="text" id="tx-desc" placeholder="Brief note" />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancel-modal-btn" class="btn secondary-btn">Cancel</button>
+                    <button type="submit" class="btn primary-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/analysis.js"></script>
+    <script src="js/transactions.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-content confirm-card">
+            <div class="confirm-body">
+                <h3 id="confirm-title">Confirm Action</h3>
+                <p id="confirm-message">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-actions">
+                <button id="confirm-cancel-btn" class="btn secondary-btn">Cancel</button>
+                <button id="confirm-accept-btn" class="btn danger-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

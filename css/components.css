@@ -1,0 +1,475 @@
+/* Forms & Inputs */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+input, select {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-main);
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+input::placeholder {
+  color: #475569;
+}
+
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  background: #0b1120;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 1.2rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: #0f172a;
+}
+
+.primary-btn:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+}
+
+.secondary-btn {
+  width: auto;
+  background-color: var(--surface-bg);
+  color: var(--text-main);
+}
+
+.secondary-btn:hover {
+  background-color: #334155;
+}
+
+.outline-btn {
+  width: auto;
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+.outline-btn:hover {
+  background: var(--primary);
+  color: #0f172a;
+}
+
+.small-btn {
+  width: auto;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.text-btn:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.action-btn.delete-btn:hover {
+  border-color: var(--expense);
+  color: var(--expense);
+}
+
+.error-message {
+  color: var(--expense);
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  text-align: center;
+  min-height: 1.2rem;
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.filter-bar .filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+.filter-bar select, .filter-bar input {
+  width: auto;
+}
+
+.custom-dates {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.export-group {
+  margin-left: auto;
+}
+
+/* Transactions Table */
+.transaction-controls {
+  margin-bottom: 1rem;
+}
+
+.transaction-controls .btn {
+  width: auto;
+}
+
+.table-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.data-table th, .data-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.data-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.type-pill {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.type-pill.income {
+  background: var(--income-bg);
+  color: var(--income);
+}
+
+.type-pill.expense {
+  background: var(--expense-bg);
+  color: var(--expense);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Analytics Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.metric-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.metric-card h3 {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.income-card .metric-value { color: var(--income); }
+.expense-card .metric-value { color: var(--expense); }
+.balance-card .metric-value { color: var(--primary); }
+
+/* Charts Layout */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.chart-box h3 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+/* Modal Dialog */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 480px;
+  padding: 1.5rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions .btn {
+  width: auto;
+}
+
+/* Danger Button */
+.danger-btn {
+  background-color: var(--expense);
+  color: #ffffff;
+  width: auto;
+}
+
+.danger-btn:hover {
+  background-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Confirmation Modal Box */
+.confirm-card {
+  max-width: 380px;
+  text-align: left;
+}
+
+.confirm-body h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+}
+
+.confirm-body p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toast {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideIn 0.25s ease-out;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.success {
+  border-color: var(--income);
+}
+
+.toast.error {
+  border-color: var(--expense);
+}
+
+.toast.info {
+  border-color: var(--primary);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Mobile Filter Bar, Tables, and Charts */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+
+  .filter-bar .filter-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-bar select, 
+  .filter-bar input {
+    flex: 1;
+    width: 100%;
+  }
+
+  .custom-dates {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .export-group,
+  .export-group .btn,
+  .transaction-controls .btn {
+    width: 100%;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .chart-wrapper {
+    height: 240px;
+  }
+
+  /* Bottom sheet style for modal on mobile */
+  .modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-content {
+    max-width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding: 1.25rem;
+  }
+
+  .toast-container {
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+  }
+
+  .toast {
+    font-size: 0.8rem;
+  }
+}

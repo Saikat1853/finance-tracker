@@ -1,0 +1,177 @@
+/* Base variables & modern dark-slate theme */
+:root {
+  --bg-color: #0b0f19;
+  --card-bg: #151e2e;
+  --surface-bg: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #2e3c51;
+  --primary: #38bdf8;
+  --primary-hover: #0284c7;
+  --income: #22c55e;
+  --expense: #ef4444;
+  --income-bg: rgba(34, 197, 94, 0.12);
+  --expense-bg: rgba(239, 68, 68, 0.12);
+  --radius: 10px;
+  --transition: all 0.2s ease-in-out;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Auth Layout */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.auth-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
+}
+
+.auth-card h2 {
+  margin-bottom: 1.75rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-main);
+}
+
+.auth-toggle {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+/* App Layout */
+.app-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brand h1 {
+  font-size: 1.5rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-badge {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Navigation Tabs */
+.tab-nav {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab-btn:hover {
+  color: var(--text-main);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tab-content {
+  display: block;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem 0.75rem;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .user-badge {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tab-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 1rem 0;
+  }
+
+  .tab-btn {
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
