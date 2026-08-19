@@ -8,7 +8,7 @@ function getDateRange(period) {
 
   if (period === "weekly") {
     const day = now.getDay();
-    const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
     start = new Date(now.setDate(diff));
     end = new Date(start);
     end.setDate(start.getDate() + 6);
@@ -18,6 +18,11 @@ function getDateRange(period) {
   } else if (period === "yearly") {
     start = new Date(now.getFullYear(), 0, 1);
     end = new Date(now.getFullYear(), 11, 31);
+  } else if (period === "all") {
+    return {
+      startDate: "1970-01-01",
+      endDate: "2099-12-31"
+    };
   } else if (period === "custom") {
     const customStart = document.getElementById("start-date")?.value;
     const customEnd = document.getElementById("end-date")?.value;
@@ -31,18 +36,26 @@ function getDateRange(period) {
   return { startDate: format(start), endDate: format(end) };
 }
 
-// Fetch transactions filtered by date range
+// Fetch transactions filtered by date and category
 async function loadTransactions() {
   const timeFrameEl = document.getElementById("time-frame");
+  const categoryFilterEl = document.getElementById("category-filter");
   const period = timeFrameEl ? timeFrameEl.value : "monthly";
+  const selectedCategory = categoryFilterEl ? categoryFilterEl.value : "all";
   const { startDate, endDate } = getDateRange(period);
 
-  const { data, error } = await supabaseClient
+  let query = supabaseClient
     .from("transactions")
     .select("*")
     .gte("date", startDate)
     .lte("date", endDate)
     .order("date", { ascending: false });
+
+  if (selectedCategory && selectedCategory !== "all") {
+    query = query.eq("category", selectedCategory);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     showToast("Error fetching transactions: " + error.message, "error");
@@ -51,12 +64,39 @@ async function loadTransactions() {
 
   currentTransactions = data || [];
   renderTable(currentTransactions);
+  updateCategoryDropdownOptions();
+
   if (typeof renderAnalytics === "function") {
     renderAnalytics(currentTransactions);
   }
 }
 
-// Render transaction rows into table
+// Populate the Category filter dynamically from available data
+async function updateCategoryDropdownOptions() {
+  const categoryFilterEl = document.getElementById("category-filter");
+  if (!categoryFilterEl) return;
+
+  const currentSelection = categoryFilterEl.value;
+
+  const { data } = await supabaseClient
+    .from("transactions")
+    .select("category");
+
+  if (!data) return;
+
+  const categories = Array.from(new Set(data.map((t) => t.category).filter(Boolean))).sort();
+
+  categoryFilterEl.innerHTML = `<option value="all">All Categories</option>`;
+  categories.forEach((cat) => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    if (cat === currentSelection) option.selected = true;
+    categoryFilterEl.appendChild(option);
+  });
+}
+
+// Render transaction rows with Edit and Delete actions
 function renderTable(transactions) {
   const txTableBody = document.getElementById("transactions-table-body");
   const emptyState = document.getElementById("table-empty-state");
@@ -81,13 +121,23 @@ function renderTable(transactions) {
         ${tx.type === "income" ? "+" : "-"}₹${Number(tx.amount).toFixed(2)}
       </td>
       <td>
-        <button class="action-btn delete-btn" data-id="${tx.id}">Delete</button>
+        <div class="action-cell">
+          <button class="action-btn edit-btn" data-id="${tx.id}">Edit</button>
+          <button class="action-btn delete-btn" data-id="${tx.id}">Delete</button>
+        </div>
       </td>
     `;
     txTableBody.appendChild(tr);
   });
 
-  // Attach delete listeners
+  // Attach Edit and Delete Event Listeners
+  document.querySelectorAll(".edit-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const id = e.target.getAttribute("data-id");
+      openEditModal(id);
+    });
+  });
+
   document.querySelectorAll(".delete-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const id = e.target.getAttribute("data-id");
@@ -96,7 +146,39 @@ function renderTable(transactions) {
   });
 }
 
-// Delete Transaction with Custom Dialog & Toast
+// Open Modal in Edit Mode with Pre-filled Form Values
+function openEditModal(id) {
+  const tx = currentTransactions.find((t) => t.id === id);
+  if (!tx) return;
+
+  document.getElementById("modal-title").textContent = "Edit Transaction";
+  document.getElementById("tx-id").value = tx.id;
+  document.getElementById("tx-type").value = tx.type;
+  document.getElementById("tx-amount").value = tx.amount;
+  document.getElementById("tx-category").value = tx.category;
+  document.getElementById("tx-date").value = tx.date;
+  document.getElementById("tx-desc").value = tx.description || "";
+
+  document.getElementById("transaction-modal").classList.remove("hidden");
+}
+
+// Open Modal in Create Mode
+function openModal() {
+  const txForm = document.getElementById("transaction-form");
+  if (txForm) txForm.reset();
+  
+  document.getElementById("modal-title").textContent = "New Transaction";
+  document.getElementById("tx-id").value = "";
+  document.getElementById("tx-date").value = new Date().toISOString().split("T")[0];
+  document.getElementById("transaction-modal").classList.remove("hidden");
+}
+
+function closeModal() {
+  const txModal = document.getElementById("transaction-modal");
+  if (txModal) txModal.classList.add("hidden");
+}
+
+// Delete Transaction
 async function deleteTransaction(id) {
   const confirmed = await customConfirm("Are you sure you want to delete this record? This action cannot be undone.");
   if (!confirmed) return;
@@ -110,23 +192,7 @@ async function deleteTransaction(id) {
   loadTransactions();
 }
 
-// Open & Close Modal Helpers
-function openModal() {
-  const txModal = document.getElementById("transaction-modal");
-  const txForm = document.getElementById("transaction-form");
-  const txDateInput = document.getElementById("tx-date");
-
-  if (txForm) txForm.reset();
-  if (txDateInput) txDateInput.value = new Date().toISOString().split("T")[0];
-  if (txModal) txModal.classList.remove("hidden");
-}
-
-function closeModal() {
-  const txModal = document.getElementById("transaction-modal");
-  if (txModal) txModal.classList.add("hidden");
-}
-
-// Initialize listeners after DOM is loaded
+// Event Listeners setup
 document.addEventListener("DOMContentLoaded", () => {
   const openModalBtn = document.getElementById("open-modal-btn");
   const closeModalBtn = document.getElementById("close-modal-btn");
@@ -147,22 +213,38 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const txId = document.getElementById("tx-id").value;
       const type = document.getElementById("tx-type").value;
       const amount = parseFloat(document.getElementById("tx-amount").value);
       const category = document.getElementById("tx-category").value.trim();
       const date = document.getElementById("tx-date").value;
       const description = document.getElementById("tx-desc").value.trim();
 
-      const { error } = await supabaseClient.from("transactions").insert([
-        { user_id: user.id, type, amount, category, date, description }
-      ]);
+      const payload = { user_id: user.id, type, amount, category, date, description };
 
-      if (error) {
-        showToast("Failed to save: " + error.message, "error");
+      let resultError = null;
+
+      if (txId) {
+        // Update Existing Transaction
+        const { error } = await supabaseClient
+          .from("transactions")
+          .update(payload)
+          .eq("id", txId);
+        resultError = error;
+      } else {
+        // Insert New Transaction
+        const { error } = await supabaseClient
+          .from("transactions")
+          .insert([payload]);
+        resultError = error;
+      }
+
+      if (resultError) {
+        showToast("Failed to save: " + resultError.message, "error");
         return;
       }
 
-      showToast("Transaction added successfully", "success");
+      showToast(txId ? "Transaction updated successfully" : "Transaction added successfully", "success");
       closeModal();
       loadTransactions();
     });

@@ -59,7 +59,7 @@
             <button class="tab-btn" data-tab="analysis-tab">Analytics & Summary</button>
         </nav>
 
-        <!-- Global Date Range Selector Bar -->
+        <!-- Global Filter Bar -->
         <section class="filter-bar">
             <div class="filter-group">
                 <label for="time-frame">Time Period:</label>
@@ -67,7 +67,17 @@
                     <option value="monthly" selected>This Month</option>
                     <option value="weekly">This Week</option>
                     <option value="yearly">This Year</option>
+                    <option value="all">All Time</option>
                     <option value="custom">Custom Range</option>
+                </select>
+            </div>
+
+            <!-- Filter by Category -->
+            <div class="filter-group">
+                <label for="category-filter">Category:</label>
+                <select id="category-filter">
+                    <option value="all" selected>All Categories</option>
+                    <!-- Dynamically populated via JS -->
                 </select>
             </div>
 
@@ -133,20 +143,36 @@
                 </div>
             </section>
 
-            <!-- Charts Section -->
+            <!-- Daily Expenses Timeline Chart -->
+            <section class="chart-box full-width-chart">
+                <h3>Daily Spending Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="daily-chart"></canvas>
+                </div>
+            </section>
+
+            <!-- Visual Charts Section -->
             <section class="charts-grid">
                 <div class="chart-box">
                     <h3>Expense by Category</h3>
                     <div class="chart-wrapper">
                         <canvas id="category-chart"></canvas>
                     </div>
+                    <div id="category-breakdown-list" class="category-breakdown-list"></div>
                 </div>
+
                 <div class="chart-box">
                     <h3>Income vs Expense Breakdown</h3>
                     <div class="chart-wrapper">
                         <canvas id="comparison-chart"></canvas>
                     </div>
                 </div>
+            </section>
+
+            <!-- Ranked Breakdown -->
+            <section class="chart-box full-width-chart" style="margin-top: 1.5rem;">
+                <h3>Where Your Money Went</h3>
+                <div id="ranked-spending-list" class="ranked-spending-list"></div>
             </section>
         </main>
     </div>
@@ -177,16 +203,22 @@
                 <div class="form-group">
                     <label for="tx-category">Category</label>
                     <input type="text" id="tx-category" list="category-suggestions" required
-                        placeholder="e.g. Groceries, Rent, Salary" />
+                        placeholder="e.g. Food & Dining, Rent, Friends" />
                     <datalist id="category-suggestions">
                         <option value="Food & Dining" />
                         <option value="Groceries" />
-                        <option value="Rent / Utilities" />
-                        <option value="Electronics & Gadgets" />
+                        <option value="College Fees" />
                         <option value="Transportation" />
+                        <option value="Shopping" />
+                        <option value="Electronics & Gadgets" />
+                        <option value="Rent / Utilities" />
+                        <option value="Bills & Recharges" />
                         <option value="Salary" />
-                        <option value="Investment / Freelance" />
+                        <option value="Investment" />
                         <option value="Entertainment" />
+                        <option value="Xerox/Printout" />
+                        <option value="Friends" />
+                        <option value="Insurance" />
                     </datalist>
                 </div>
 
@@ -202,19 +234,11 @@
 
                 <div class="modal-actions">
                     <button type="button" id="cancel-modal-btn" class="btn secondary-btn">Cancel</button>
-                    <button type="submit" class="btn primary-btn">Save</button>
+                    <button type="submit" id="save-tx-btn" class="btn primary-btn">Save</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <!-- Application Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/export.js"></script>
-    <script src="js/analysis.js"></script>
-    <script src="js/transactions.js"></script>
-    <script src="js/app.js"></script>
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container"></div>
@@ -232,6 +256,14 @@
             </div>
         </div>
     </div>
+
+    <!-- Application Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/analysis.js"></script>
+    <script src="js/transactions.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>

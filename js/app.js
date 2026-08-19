@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
   const timeFrameSelect = document.getElementById("time-frame");
+  const categoryFilterSelect = document.getElementById("category-filter");
   const customDateContainer = document.getElementById("custom-date-container");
   const applyFilterBtn = document.getElementById("apply-filter-btn");
   const exportBtn = document.getElementById("export-csv-btn");
@@ -19,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Time frame selector handler
+  // Time frame filter change
   timeFrameSelect.addEventListener("change", (e) => {
     if (e.target.value === "custom") {
       customDateContainer.classList.remove("hidden");
@@ -29,6 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Category filter change
+  if (categoryFilterSelect) {
+    categoryFilterSelect.addEventListener("change", () => {
+      loadTransactions();
+    });
+  }
+
   // Custom date filter apply button
   applyFilterBtn.addEventListener("click", () => {
     loadTransactions();
@@ -37,7 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // CSV Export Trigger
   exportBtn.addEventListener("click", () => {
     const period = timeFrameSelect.value;
-    exportToCSV(currentTransactions, `finance_export_${period}_${new Date().toISOString().split("T")[0]}.csv`);
+    const cat = categoryFilterSelect.value;
+    exportToCSV(
+      currentTransactions,
+      `finance_${cat}_${period}_${new Date().toISOString().split("T")[0]}.csv`
+    );
   });
 });
 
