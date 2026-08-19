@@ -105,7 +105,14 @@
             </section>
 
             <!-- Transactions List Table -->
+            <!-- Inside index.html: Transactions List Table -->
             <section class="table-container">
+                <!-- Loading Spinner Element -->
+                <div id="table-loading" class="loading-state hidden">
+                    <div class="spinner"></div>
+                    <span>Loading transactions...</span>
+                </div>
+
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -258,12 +265,13 @@
     </div>
 
     <!-- Application Scripts -->
+    <!-- Application Scripts (Exact load order) -->
     <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
     <script src="js/export.js"></script>
     <script src="js/analysis.js"></script>
     <script src="js/transactions.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 
 </html>

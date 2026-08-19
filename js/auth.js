@@ -58,12 +58,16 @@ logoutBtn.addEventListener("click", async () => {
 });
 
 // UI State Updater
-function updateAuthState(session) {
+async function updateAuthState(session) {
   if (session?.user) {
     authSection.classList.add("hidden");
     appSection.classList.remove("hidden");
     userDisplay.textContent = session.user.email;
-    loadTransactions();
+    
+    // Automatically fetch transactions and category options
+    if (typeof loadTransactions === "function") {
+      await loadTransactions();
+    }
   } else {
     authSection.classList.remove("hidden");
     appSection.classList.add("hidden");
@@ -71,12 +75,13 @@ function updateAuthState(session) {
   }
 }
 
-// 1. Check existing cached session immediately on refresh
-supabaseClient.auth.getSession().then(({ data: { session } }) => {
+// Initial Session Check on Page Load
+document.addEventListener("DOMContentLoaded", async () => {
+  const { data: { session } } = await supabaseClient.auth.getSession();
   updateAuthState(session);
 });
 
-// 2. Listen to subsequent state changes (login, logout, token refresh)
+// Real-time Auth State Change Listener
 supabaseClient.auth.onAuthStateChange((event, session) => {
   updateAuthState(session);
 });

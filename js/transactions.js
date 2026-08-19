@@ -36,10 +36,19 @@ function getDateRange(period) {
   return { startDate: format(start), endDate: format(end) };
 }
 
-// Fetch transactions filtered by date and category
+// Fetch transactions filtered by date and category with loading state
 async function loadTransactions() {
   const timeFrameEl = document.getElementById("time-frame");
   const categoryFilterEl = document.getElementById("category-filter");
+  const loadingEl = document.getElementById("table-loading");
+  const emptyState = document.getElementById("table-empty-state");
+  const txTableBody = document.getElementById("transactions-table-body");
+
+  // Show spinner, clear table temporarily
+  if (loadingEl) loadingEl.classList.remove("hidden");
+  if (emptyState) emptyState.classList.add("hidden");
+  if (txTableBody) txTableBody.innerHTML = "";
+
   const period = timeFrameEl ? timeFrameEl.value : "monthly";
   const selectedCategory = categoryFilterEl ? categoryFilterEl.value : "all";
   const { startDate, endDate } = getDateRange(period);
@@ -56,6 +65,9 @@ async function loadTransactions() {
   }
 
   const { data, error } = await query;
+
+  // Hide spinner
+  if (loadingEl) loadingEl.classList.add("hidden");
 
   if (error) {
     showToast("Error fetching transactions: " + error.message, "error");
