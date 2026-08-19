@@ -8,6 +8,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const applyFilterBtn = document.getElementById("apply-filter-btn");
   const exportBtn = document.getElementById("export-csv-btn");
 
+  // Profile Modal Elements
+  const profileBtn = document.getElementById("profile-btn");
+  const profileModal = document.getElementById("profile-modal");
+  const closeProfileModalBtn = document.getElementById("close-profile-modal-btn");
+  const backupAllCsvBtn = document.getElementById("backup-all-csv-btn");
+  const csvFileInput = document.getElementById("csv-file-input");
+
   // Tab switching
   tabs.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -42,15 +49,88 @@ document.addEventListener("DOMContentLoaded", () => {
     loadTransactions();
   });
 
-  // CSV Export Trigger
+  // CSV Export Filtered Data Trigger
   exportBtn.addEventListener("click", () => {
     const period = timeFrameSelect.value;
-    const cat = categoryFilterSelect.value;
+    const cat = categoryFilterSelect ? categoryFilterSelect.value : "all";
     exportToCSV(
       currentTransactions,
       `finance_${cat}_${period}_${new Date().toISOString().split("T")[0]}.csv`
     );
   });
+
+  // Open / Close Profile Modal Helpers
+  function openProfileModal() {
+    if (profileModal) {
+      profileModal.classList.remove("hidden");
+      document.body.classList.add("modal-open");
+    }
+  }
+
+  function closeProfileModal() {
+    if (profileModal) {
+      profileModal.classList.add("hidden");
+      document.body.classList.remove("modal-open");
+    }
+  }
+
+  if (profileBtn) profileBtn.addEventListener("click", openProfileModal);
+  if (closeProfileModalBtn) closeProfileModalBtn.addEventListener("click", closeProfileModal);
+
+  // Close profile modal on backdrop click
+  if (profileModal) {
+    profileModal.addEventListener("click", (e) => {
+      if (e.target === profileModal) {
+        closeProfileModal();
+      }
+    });
+  }
+
+  // Global ESC key listener to close active modals
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeProfileModal();
+      const txModal = document.getElementById("transaction-modal");
+      if (txModal && !txModal.classList.contains("hidden")) {
+        txModal.classList.add("hidden");
+        document.body.classList.remove("modal-open");
+      }
+      const confirmModal = document.getElementById("confirm-modal");
+      if (confirmModal && !confirmModal.classList.contains("hidden")) {
+        confirmModal.classList.add("hidden");
+        document.body.classList.remove("modal-open");
+      }
+    }
+  });
+
+  // Download All-Time Backup CSV from Profile
+  if (backupAllCsvBtn) {
+    backupAllCsvBtn.addEventListener("click", async () => {
+      const { data, error } = await supabaseClient
+        .from("transactions")
+        .select("*")
+        .order("date", { ascending: false });
+
+      if (error || !data) {
+        showToast("Failed to generate backup: " + (error?.message || "No data"), "error");
+        return;
+      }
+
+      exportToCSV(data, `full_finance_backup_${new Date().toISOString().split("T")[0]}.csv`);
+      showToast("Full backup downloaded successfully!", "success");
+    });
+  }
+
+  // Handle CSV File Upload via import.js
+  if (csvFileInput) {
+    csvFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleCSVUpload(file);
+        csvFileInput.value = "";
+      }
+    });
+  }
 });
 
 // Global Toast Notification
@@ -83,9 +163,11 @@ function customConfirm(message, title = "Delete Transaction") {
     titleEl.textContent = title;
     msgEl.textContent = message;
     modal.classList.remove("hidden");
+    document.body.classList.add("modal-open");
 
     const cleanup = (result) => {
       modal.classList.add("hidden");
+      document.body.classList.remove("modal-open");
       acceptBtn.removeEventListener("click", onAccept);
       cancelBtn.removeEventListener("click", onCancel);
       resolve(result);

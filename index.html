@@ -42,14 +42,16 @@
 
     <!-- App Dashboard Container (Visible when logged in) -->
     <div id="app-section" class="app-container hidden">
-        <!-- Top Navigation Header -->
+       <!-- Top Navigation Header -->
         <header class="app-header">
             <div class="brand">
                 <h1>FinanceTracker</h1>
             </div>
             <div class="header-actions">
-                <span id="user-display" class="user-badge"></span>
-                <button id="logout-btn" class="btn secondary-btn">Log Out</button>
+                <!-- Clean Circular Profile Avatar Button -->
+                <button id="profile-btn" class="profile-avatar-btn" title="Profile & Settings">
+                    <span class="avatar-icon">👤</span>
+                </button>
             </div>
         </header>
 
@@ -77,7 +79,6 @@
                 <label for="category-filter">Category:</label>
                 <select id="category-filter">
                     <option value="all" selected>All Categories</option>
-                    <!-- Dynamically populated via JS -->
                 </select>
             </div>
 
@@ -105,7 +106,6 @@
             </section>
 
             <!-- Transactions List Table -->
-            <!-- Inside index.html: Transactions List Table -->
             <section class="table-container">
                 <!-- Loading Spinner Element -->
                 <div id="table-loading" class="loading-state hidden">
@@ -182,6 +182,67 @@
                 <div id="ranked-spending-list" class="ranked-spending-list"></div>
             </section>
         </main>
+    </div>
+
+<!-- Profile & Backup/Security Modal Dialog -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content profile-modal-content">
+            <div class="modal-header">
+                <h3>Profile & Settings</h3>
+                <button id="close-profile-modal-btn" class="close-btn">&times;</button>
+            </div>
+            
+            <div class="profile-info-banner">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-details">
+                    <span class="profile-label">Signed in as</span>
+                    <strong id="profile-email-text" class="profile-email"></strong>
+                </div>
+            </div>
+
+            <!-- Section 1: Data Backup & CSV Restore -->
+            <div class="profile-section">
+                <h4>📦 Data Backup & Restore</h4>
+                <div class="profile-btn-grid">
+                    <button id="backup-all-csv-btn" class="btn outline-btn">
+                        📥 Download Backup
+                    </button>
+                    
+                    <label for="csv-file-input" class="btn secondary-btn upload-label-btn">
+                        📤 Upload & Restore
+                        <input type="file" id="csv-file-input" accept=".csv" class="hidden-file-input" />
+                    </label>
+                </div>
+                <small class="helper-text">Accepts CSV files with headers: Date, Type, Category, Amount, Description</small>
+            </div>
+
+            <hr class="profile-divider" />
+
+            <!-- Section 2: Change Password -->
+            <div class="profile-section">
+                <h4>🔒 Change Password</h4>
+                <form id="change-password-form">
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" required minlength="6" placeholder="Min. 6 characters" />
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-new-password">Confirm Password</label>
+                        <input type="password" id="confirm-new-password" required minlength="6" placeholder="Confirm new password" />
+                    </div>
+                    <button type="submit" id="update-password-btn" class="btn primary-btn">Update Password</button>
+                </form>
+            </div>
+
+            <hr class="profile-divider" />
+
+            <!-- Section 3: Logout Action -->
+            <div class="profile-section profile-logout-section">
+                <button id="logout-btn" class="btn danger-btn logout-full-btn">
+                    🚪 Log Out
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Add/Edit Transaction Modal Dialog -->
@@ -264,10 +325,10 @@
         </div>
     </div>
 
-    <!-- Application Scripts -->
     <!-- Application Scripts (Exact load order) -->
     <script src="js/config.js"></script>
     <script src="js/export.js"></script>
+    <script src="js/import.js"></script>
     <script src="js/analysis.js"></script>
     <script src="js/transactions.js"></script>
     <script src="js/app.js"></script>

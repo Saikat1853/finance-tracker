@@ -11,8 +11,9 @@ const authSubmitBtn = document.getElementById("auth-submit-btn");
 const authToggleBtn = document.getElementById("auth-toggle-btn");
 const authToggleText = document.getElementById("auth-toggle-text");
 const authError = document.getElementById("auth-error");
-const userDisplay = document.getElementById("user-display");
+const profileEmailText = document.getElementById("profile-email-text");
 const logoutBtn = document.getElementById("logout-btn");
+const changePasswordForm = document.getElementById("change-password-form");
 
 // Toggle Sign In / Sign Up Mode
 authToggleBtn.addEventListener("click", () => {
@@ -51,27 +52,73 @@ authForm.addEventListener("submit", async (e) => {
   }
 });
 
+// Handle Password Change in Profile with Session Validation
+if (changePasswordForm) {
+  changePasswordForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newPassword = document.getElementById("new-password").value;
+    const confirmPassword = document.getElementById("confirm-new-password").value;
+
+    if (newPassword.length < 6) {
+      showToast("Password must be at least 6 characters long", "error");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showToast("Passwords do not match!", "error");
+      return;
+    }
+
+    // 1. Verify active session before updating
+    const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+
+    if (sessionError || !session) {
+      showToast("Your session has expired. Please log out and sign in again.", "error");
+      return;
+    }
+
+    // 2. Perform password update
+    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      showToast("Failed to update password: " + error.message, "error");
+      return;
+    }
+
+    showToast("Password updated successfully!", "success");
+    changePasswordForm.reset();
+    
+    const profileModal = document.getElementById("profile-modal");
+    if (profileModal) {
+      profileModal.classList.add("hidden");
+      document.body.classList.remove("modal-open");
+    }
+  });
+}
+
 // Handle Logout
-logoutBtn.addEventListener("click", async () => {
-  await supabaseClient.auth.signOut();
-  window.location.reload();
-});
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await supabaseClient.auth.signOut();
+    window.location.reload();
+  });
+}
 
 // UI State Updater
 async function updateAuthState(session) {
   if (session?.user) {
     authSection.classList.add("hidden");
     appSection.classList.remove("hidden");
-    userDisplay.textContent = session.user.email;
+    if (profileEmailText) profileEmailText.textContent = session.user.email;
     
-    // Automatically fetch transactions and category options
+    // Automatically fetch transactions
     if (typeof loadTransactions === "function") {
       await loadTransactions();
     }
   } else {
     authSection.classList.remove("hidden");
     appSection.classList.add("hidden");
-    userDisplay.textContent = "";
+    if (profileEmailText) profileEmailText.textContent = "";
   }
 }
 
