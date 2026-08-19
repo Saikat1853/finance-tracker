@@ -2,6 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
+  const globalFilterBar = document.getElementById("global-tx-filter-bar");
   const timeFrameSelect = document.getElementById("time-frame");
   const categoryFilterSelect = document.getElementById("category-filter");
   const customDateContainer = document.getElementById("custom-date-container");
@@ -22,8 +23,23 @@ document.addEventListener("DOMContentLoaded", () => {
       tabContents.forEach((c) => c.classList.add("hidden"));
 
       btn.classList.add("active");
-      const targetTab = document.getElementById(btn.getAttribute("data-tab"));
+      const tabName = btn.getAttribute("data-tab");
+      const targetTab = document.getElementById(tabName);
       if (targetTab) targetTab.classList.remove("hidden");
+
+      // Show global filter bar for Transactions and Analytics, hide for Money Owed
+      if (globalFilterBar) {
+        if (tabName === "transactions-tab" || tabName === "analysis-tab") {
+          globalFilterBar.classList.remove("hidden");
+        } else {
+          globalFilterBar.classList.add("hidden");
+        }
+      }
+
+      // Re-trigger load/analytics render if switching tabs
+      if (tabName === "money-owed-tab" && typeof loadMoneyRecords === "function") {
+        loadMoneyRecords();
+      }
     });
   });
 
@@ -90,16 +106,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeProfileModal();
-      const txModal = document.getElementById("transaction-modal");
-      if (txModal && !txModal.classList.contains("hidden")) {
-        txModal.classList.add("hidden");
-        document.body.classList.remove("modal-open");
-      }
-      const confirmModal = document.getElementById("confirm-modal");
-      if (confirmModal && !confirmModal.classList.contains("hidden")) {
-        confirmModal.classList.add("hidden");
-        document.body.classList.remove("modal-open");
-      }
+      [
+        "transaction-modal",
+        "confirm-modal",
+        "money-record-modal",
+        "repayment-modal",
+        "view-record-modal"
+      ].forEach((id) => {
+        const m = document.getElementById(id);
+        if (m && !m.classList.contains("hidden")) {
+          m.classList.add("hidden");
+        }
+      });
+      document.body.classList.remove("modal-open");
     }
   });
 

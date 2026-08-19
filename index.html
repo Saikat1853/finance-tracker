@@ -42,13 +42,12 @@
 
     <!-- App Dashboard Container (Visible when logged in) -->
     <div id="app-section" class="app-container hidden">
-       <!-- Top Navigation Header -->
+        <!-- Top Navigation Header -->
         <header class="app-header">
             <div class="brand">
                 <h1>FinanceTracker</h1>
             </div>
             <div class="header-actions">
-                <!-- Clean Circular Profile Avatar Button -->
                 <button id="profile-btn" class="profile-avatar-btn" title="Profile & Settings">
                     <span class="avatar-icon">👤</span>
                 </button>
@@ -58,11 +57,12 @@
         <!-- Navigation Tabs -->
         <nav class="tab-nav">
             <button class="tab-btn active" data-tab="transactions-tab">Transactions</button>
+            <button class="tab-btn" data-tab="money-owed-tab">Money Owed</button>
             <button class="tab-btn" data-tab="analysis-tab">Analytics & Summary</button>
         </nav>
 
-        <!-- Global Filter Bar -->
-        <section class="filter-bar">
+        <!-- Global Filter Bar (Visible for Transactions & Analytics Tabs) -->
+        <section id="global-tx-filter-bar" class="filter-bar">
             <div class="filter-group">
                 <label for="time-frame">Time Period:</label>
                 <select id="time-frame">
@@ -74,7 +74,6 @@
                 </select>
             </div>
 
-            <!-- Filter by Category -->
             <div class="filter-group">
                 <label for="category-filter">Category:</label>
                 <select id="category-filter">
@@ -107,7 +106,6 @@
 
             <!-- Transactions List Table -->
             <section class="table-container">
-                <!-- Loading Spinner Element -->
                 <div id="table-loading" class="loading-state hidden">
                     <div class="spinner"></div>
                     <span>Loading transactions...</span>
@@ -132,7 +130,110 @@
             </section>
         </main>
 
-        <!-- Tab 2: Analytics & Summary -->
+        <!-- Tab 2: Money Owed (Receivables / Payables) -->
+        <main id="money-owed-tab" class="tab-content hidden">
+            <!-- 4 Summary Metric Cards -->
+            <section class="metrics-grid money-owed-metrics">
+                <div class="metric-card income-card">
+                    <h3>I'm Owed</h3>
+                    <p id="mo-total-owed" class="metric-value">₹0.00</p>
+                </div>
+                <div class="metric-card expense-card">
+                    <h3>I Owe</h3>
+                    <p id="mo-total-i-owe" class="metric-value">₹0.00</p>
+                </div>
+                <div class="metric-card balance-card">
+                    <h3>Net Position</h3>
+                    <p id="mo-net-position" class="metric-value">₹0.00</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Active Records</h3>
+                    <p id="mo-active-count" class="metric-value" style="color: var(--text-main);">0</p>
+                </div>
+            </section>
+
+            <!-- Search, Filters, Sort & Actions Bar -->
+            <section class="filter-bar money-filter-bar">
+                <div class="filter-group search-group">
+                    <input type="text" id="mo-search-input" placeholder="🔍 Search person, description..." />
+                </div>
+
+                <div class="filter-group">
+                    <label for="mo-direction-filter">Type:</label>
+                    <select id="mo-direction-filter">
+                        <option value="all" selected>All</option>
+                        <option value="lent">Money Receivable (I'm Owed)</option>
+                        <option value="borrowed">Money Payable (I Owe)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="mo-status-filter">Status:</label>
+                    <select id="mo-status-filter">
+                        <option value="all" selected>All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Partially Paid">Partially Paid</option>
+                        <option value="Settled">Settled</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="mo-sort-filter">Sort:</label>
+                    <select id="mo-sort-filter">
+                        <option value="newest" selected>Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="amount-high">Highest Amount</option>
+                        <option value="amount-low">Lowest Amount</option>
+                        <option value="due-nearest">Nearest Due Date</option>
+                    </select>
+                </div>
+
+                <div class="export-group">
+                    <button id="mo-export-csv-btn" class="btn outline-btn">Export Money Owed CSV</button>
+                </div>
+            </section>
+
+            <section class="transaction-controls">
+                <button id="open-mo-modal-btn" class="btn primary-btn">+ Add Record</button>
+            </section>
+
+            <div id="mo-loading" class="loading-state hidden">
+                <div class="spinner"></div>
+                <span>Loading money owed records...</span>
+            </div>
+
+            <div id="mo-empty-state" class="empty-state hidden">
+                <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">No Money Owed Records</p>
+                <p style="margin-bottom: 1.25rem;">You currently don't have any lending or borrowing records matching your filters.</p>
+                <button class="btn primary-btn" style="width: auto; margin: 0 auto;" onclick="openMoneyModal()">+ Add Record</button>
+            </div>
+
+            <div id="mo-content-container">
+                <section class="mo-section" id="mo-lent-section">
+                    <h3 class="mo-section-title">
+                        <span>🟢 Money Receivable</span>
+                        <small id="mo-lent-count" class="badge-count">0</small>
+                    </h3>
+                    <div id="mo-lent-grid" class="mo-cards-grid"></div>
+                </section>
+
+                <section class="mo-section" id="mo-borrowed-section" style="margin-top: 2rem;">
+                    <h3 class="mo-section-title">
+                        <span>🔴 Money Payable</span>
+                        <small id="mo-borrowed-count" class="badge-count">0</small>
+                    </h3>
+                    <div id="mo-borrowed-grid" class="mo-cards-grid"></div>
+                </section>
+
+                <section class="chart-box mo-insights-box" style="margin-top: 2rem;">
+                    <h3>💡 Money Owed Insights</h3>
+                    <div id="mo-insights-content" class="mo-insights-grid"></div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Tab 3: Analytics & Summary -->
         <main id="analysis-tab" class="tab-content hidden">
             <!-- Summary Metric Cards -->
             <section class="metrics-grid">
@@ -184,7 +285,7 @@
         </main>
     </div>
 
-<!-- Profile & Backup/Security Modal Dialog -->
+    <!-- 1. Profile & Backup/Security Modal Dialog -->
     <div id="profile-modal" class="modal hidden">
         <div class="modal-content profile-modal-content">
             <div class="modal-header">
@@ -200,7 +301,6 @@
                 </div>
             </div>
 
-            <!-- Section 1: Data Backup & CSV Restore -->
             <div class="profile-section">
                 <h4>📦 Data Backup & Restore</h4>
                 <div class="profile-btn-grid">
@@ -218,7 +318,6 @@
 
             <hr class="profile-divider" />
 
-            <!-- Section 2: Change Password -->
             <div class="profile-section">
                 <h4>🔒 Change Password</h4>
                 <form id="change-password-form">
@@ -236,7 +335,6 @@
 
             <hr class="profile-divider" />
 
-            <!-- Section 3: Logout Action -->
             <div class="profile-section profile-logout-section">
                 <button id="logout-btn" class="btn danger-btn logout-full-btn">
                     🚪 Log Out
@@ -245,7 +343,7 @@
         </div>
     </div>
 
-    <!-- Add/Edit Transaction Modal Dialog -->
+    <!-- 2. Add/Edit Transaction Modal Dialog -->
     <div id="transaction-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -308,6 +406,157 @@
         </div>
     </div>
 
+    <!-- 3. Add/Edit Money Owed Record Modal -->
+    <div id="money-record-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="mo-modal-title">Add Money Record</h3>
+                <button id="close-mo-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <form id="money-record-form">
+                <input type="hidden" id="mo-id" />
+
+                <div class="form-group">
+                    <label>Direction</label>
+                    <div class="direction-toggle-group">
+                        <label class="direction-option">
+                            <input type="radio" name="mo-direction" value="lent" checked />
+                            <span class="direction-label lent-label">🟢 I Lent Money</span>
+                        </label>
+                        <label class="direction-option">
+                            <input type="radio" name="mo-direction" value="borrowed" />
+                            <span class="direction-label borrowed-label">🔴 I Borrowed Money</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mo-person">Person *</label>
+                    <input type="text" id="mo-person" required placeholder="e.g. Arun, Rahul" />
+                </div>
+
+                <div class="form-group">
+                    <label for="mo-amount">Amount (₹) *</label>
+                    <input type="number" id="mo-amount" step="0.01" min="0.01" required placeholder="1000" />
+                </div>
+
+                <div class="form-group">
+                    <label for="mo-date">Date *</label>
+                    <input type="date" id="mo-date" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="mo-due-date">Due Date (Optional)</label>
+                    <input type="date" id="mo-due-date" />
+                </div>
+
+                <div class="form-group">
+                    <label for="mo-desc">Description (Optional)</label>
+                    <input type="text" id="mo-desc" placeholder="e.g. Lunch, Travel, Emergency" />
+                </div>
+
+                <div class="form-group">
+                    <label for="mo-notes">Notes (Optional)</label>
+                    <input type="text" id="mo-notes" placeholder="Additional details..." />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancel-mo-modal-btn" class="btn secondary-btn">Cancel</button>
+                    <button type="submit" id="save-mo-btn" class="btn primary-btn">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. Add Repayment Modal Dialog -->
+    <div id="repayment-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Repayment</h3>
+                <button id="close-repayment-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <form id="repayment-form">
+                <input type="hidden" id="rep-record-id" />
+                <input type="hidden" id="rep-max-outstanding" />
+
+                <div class="repayment-summary-box">
+                    <div>
+                        <span class="profile-label">Person</span>
+                        <strong id="rep-person-text" style="color: var(--text-main); font-size: 1.05rem;">-</strong>
+                    </div>
+                    <div>
+                        <span class="profile-label">Outstanding Balance</span>
+                        <strong id="rep-outstanding-text" style="color: var(--primary); font-size: 1.05rem;">₹0.00</strong>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="rep-amount">Repayment Amount (₹) *</label>
+                    <input type="number" id="rep-amount" step="0.01" min="0.01" required placeholder="0.00" />
+                </div>
+
+                <div class="form-group">
+                    <label for="rep-date">Date *</label>
+                    <input type="date" id="rep-date" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="rep-note">Note (Optional)</label>
+                    <input type="text" id="rep-note" placeholder="e.g. Returned via UPI, Cash" />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancel-repayment-modal-btn" class="btn secondary-btn">Cancel</button>
+                    <button type="submit" class="btn primary-btn">Save Repayment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. View Full Record Details Modal Dialog -->
+    <div id="view-record-modal" class="modal hidden">
+        <div class="modal-content view-record-content">
+            <div class="modal-header">
+                <h3 id="view-person-title">Record Details</h3>
+                <button id="close-view-record-btn" class="close-btn">&times;</button>
+            </div>
+
+            <div class="view-record-summary">
+                <div class="view-metric">
+                    <span class="profile-label" id="view-direction-label">Total Amount</span>
+                    <strong id="view-original-amount" class="metric-value">₹0.00</strong>
+                </div>
+                <div class="view-metric">
+                    <span class="profile-label">Total Repaid</span>
+                    <strong id="view-repaid-amount" class="metric-value" style="color: var(--income);">₹0.00</strong>
+                </div>
+                <div class="view-metric">
+                    <span class="profile-label">Remaining Balance</span>
+                    <strong id="view-remaining-amount" class="metric-value" style="color: var(--expense);">₹0.00</strong>
+                </div>
+            </div>
+
+            <div class="view-meta-grid">
+                <div><strong>Start Date:</strong> <span id="view-date">-</span></div>
+                <div><strong>Due Date:</strong> <span id="view-due-date">-</span></div>
+                <div><strong>Status:</strong> <span id="view-status-pill">-</span></div>
+                <div><strong>Description:</strong> <span id="view-desc">-</span></div>
+                <div><strong>Notes:</strong> <span id="view-notes">-</span></div>
+            </div>
+
+            <hr class="profile-divider" />
+
+            <h4 style="margin-bottom: 0.85rem; font-size: 1rem;">Transaction History</h4>
+            <div id="view-history-timeline" class="history-timeline"></div>
+
+            <div class="modal-actions view-record-actions">
+                <button id="view-add-repayment-btn" class="btn primary-btn" style="width: auto;">+ Add Repayment</button>
+                <button id="view-edit-btn" class="btn secondary-btn" style="width: auto;">Edit Record</button>
+                <button id="view-delete-btn" class="btn danger-btn" style="width: auto;">Delete Record</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container"></div>
 
@@ -331,6 +580,8 @@
     <script src="js/import.js"></script>
     <script src="js/analysis.js"></script>
     <script src="js/transactions.js"></script>
+    <script src="js/money-repayments.js"></script>
+    <script src="js/money-owed.js"></script>
     <script src="js/app.js"></script>
     <script src="js/auth.js"></script>
 </body>
