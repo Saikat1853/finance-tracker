@@ -35,6 +35,7 @@ A lightweight, modern, mobile-responsive single-page web application built with 
 
 ## 📁 Project Structure
 
+```text
 finance-tracker/
 │
 ├── index.html              # Main SPA layout (Auth, Dashboard, Analytics, Modals)
@@ -45,9 +46,10 @@ finance-tracker/
 │   └── components.css      # Form controls, tables, buttons, metrics, charts, modals & toasts
 │
 └── js/
-├── config.js           # Supabase client initialization & API credentials
-├── auth.js             # Auth workflows, session persistence & route guards
-├── transactions.js     # Transaction CRUD, modal controls & category population
-├── analysis.js         # Chart.js rendering, ranked spending bars & metric calculations
-├── export.js           # Filter-aware CSV export utility
-└── app.js              # Tab navigation, global event handlers, toast & confirm utilities
+    ├── config.js           # Supabase client initialization & API credentials
+    ├── auth.js             # Auth workflows, session persistence & route guards
+    ├── transactions.js     # Transaction CRUD, modal controls & category population
+    ├── analysis.js         # Chart.js rendering, ranked spending bars & metric calculations
+    ├── export.js           # Filter-aware CSV export utility
+    └── app.js              # Tab navigation, global event handlers, toast & confirm utilities
+```
